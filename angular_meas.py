@@ -55,28 +55,18 @@ def measure(sleep_time):
     return uT, uT_std
 
 # Make sure power is of in the beginning and wait for 8 seconds
-probe_number = 12
-offset_out = open("offset_" + str(probe_number), "w+")
 
-for i in range(10):
-    power.power_state(0)
-    time.sleep(8)
-    field, field_std = measure(2.5)
-    print(field, field_std)
+offset_out = open("angular_1.txt", "w+")
+
+for i in range(0,41):
     power.power_state(1)
     time.sleep(6)
-    motor.rotate(10000)
-    time.sleep(4)
+    motor.rotate(-500)
+    time.sleep(3)
     power.power_state(0)
     time.sleep(10)
-    field_flip, field_flip_std = measure(2.5)
-    print(field_flip, field_flip_std)
-    offset = (field + field_flip) * 0.5
-    print("Offset:", offset, "uT")
-    offset_out.write(str(offset) + " " + str(field) + " " + str(field_flip) + "\n")
-    power.power_state(1)
-    time.sleep(6)
-    motor.rotate(-10000)
-    time.sleep(4)
+    field, field_std = measure(2.5)
+    print(field, field_std)
+    offset_out.write(str(field) + " " + str(field_std) + "\n")
 
 offset_out.close()
