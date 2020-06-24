@@ -8,6 +8,8 @@ import serial4850
 import relaycontrol
 
 volt_uT = 10
+volt_nT = 10000
+uT_mG = 10
 
 # Initialize serial communication with Step Motor Driver
 motor = serial4850.Serial4850('COM5')
@@ -31,29 +33,41 @@ dmm.write('TRIG:DEL 0.1')           # First measurement delay
 
 time.sleep(1)
 
-init_time = time.time()
+
 
 def measure():
 
     volt = float(dmm.query('READ?'))
 
-    uT = round(volt * volt_uT, 4)
+    nT = round(volt * volt_nT, 1)
 
-    return uT
+    return nT
 
 # Make sure power is of in the beginning and wait for 8 seconds
+measure_out = open("ang_vs_field2.txt", "w+")
 
-offset_out = open("angular_sample.txt", "w+")
+init_time = time.time()
 
-for i in range(0,41):
-    power.power_state(1)
-    time.sleep(6)
-    motor.rotate(500)
-    time.sleep(3)
+angle_list = [x for x in range(0, 20400, 400)]
+
+for i in angle_list:
+
+    field = []
     power.power_state(0)
     time.sleep(10)
-    field, field_std = measure()
-    print(field, field_std)
-    offset_out.write(str(field) + " " + str(field_std) + "\n")
 
-offset_out.close()
+    for i in range(10):
+        cur_field = measure()
+        field.append(cur_field)
+        time.sleep(0.3)
+        rel_time = time.time() - init_time
+        print("B_read =", cur_field, "nT", "Time =", round(rel_time, 1), "s")
+
+    measure_out.write(str(i) + " " + str(np.mean(field)) + "\n")
+    
+    power.power_state(1)
+    time.sleep(10)
+    motor.rotate(400)
+    time.sleep(2)
+
+measure_out.close()

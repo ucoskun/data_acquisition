@@ -8,6 +8,7 @@ import serial4850
 import relaycontrol
 
 volt_uT = 10
+volt_nT = 10000
 uT_mG = 10
 
 # Initialize serial communication with Step Motor Driver
@@ -26,57 +27,71 @@ dmm.write('*RST')                   # Reset the settings
 dmm.write('SENS:VOLT:DC:NPLC 10')   # NPLC = 10 (Can change later)
 dmm.write('VOLT:DC:IMP:AUTO 1')     # 10G Input Impedance
 dmm.write('VOLT:RANG 1')            # Voltage full scale range
-dmm.write('VOLT:ZERO:AUTO 0')       # Turn auto zero off
+dmm.write('VOLT:ZERO:AUTO 1')       # Turn auto zero off
 dmm.write('TRIG:SOUR IMM')          # Trigger immediately
 dmm.write('TRIG:DEL 0.1')           # First measurement delay
-dmm.write('SAMPLE:SOURCE TIM')
-dmm.write('SAMPLE:TIM 200E-3')      # Time gap between the readings
-dmm.write('SAMPLE:COUNT 5')         # Number of counts
-dmm.write('CALC:STAT ON')           # Enable statistics
-dmm.write('CALC:FUNC AVER')         # Select averaging operations
 
 time.sleep(1)
 
-init_time = time.time()
 
-def measure(sleep_time):
-    dmm.write('CALC:AVER:CLEAR')
-    dmm.write('SENS:VOLT:DC:ZERO:AUTO ONCE')
-    dmm.write('INIT')
 
-    time.sleep(sleep_time)
+def measure():
 
-    volt = float(dmm.query('CALC:AVER:AVER?'))
-    volt_std = float(dmm.query('CALC:AVER:SDEV?'))
+    volt = float(dmm.query('READ?'))
 
-    uT = round(volt * volt_uT, 4)
-    uT_std = round(volt_std * volt_uT, 4)
+    nT = round(volt * volt_nT, 1)
 
-    return uT, uT_std
+    return nT
 
 # Make sure power is of in the beginning and wait for 8 seconds
-probe_number = 12
-offset_out = open("offset_" + str(probe_number), "w+")
+offset_out = open("offset_1_6-24-2020-rand.txt", "w+")
+measure_out = open("field_1_6-24-2020-rand.txt", "w+")
 
-for i in range(10):
+init_time = time.time()
+
+angle_list = [i for x in range(0, 20200, 200)]
+
+for i in angle_list:
+
+    field = []
+    field_flip = []
     power.power_state(0)
-    time.sleep(8)
-    field, field_std = measure(2.5)
-    print(field, field_std)
+    time.sleep(10)
+
+    for i in range(10):
+        cur_field = measure()
+        field.append(cur_field)
+        time.sleep(0.3)
+        rel_time = time.time() - init_time
+        print("0 deg Field =", cur_field, "nT", "Time = ", rel_time)
+        measure_out.write(str(rel_time) + " " + str(cur_field) + "\n")
+    
     power.power_state(1)
     time.sleep(6)
-    motor.rotate(10000)
+    motor.rotate(200)
     time.sleep(4)
     power.power_state(0)
     time.sleep(10)
-    field_flip, field_flip_std = measure(2.5)
-    print(field_flip, field_flip_std)
-    offset = (field + field_flip) * 0.5
-    print("Offset:", offset, "uT")
-    offset_out.write(str(offset) + " " + str(field) + " " + str(field_flip) + "\n")
+
+    for i in range(10):
+        cur_field = measure()
+        field_flip.append(cur_field)
+        time.sleep(0.3)
+        rel_time = time.time() - init_time
+        print("180 deg Field =", cur_field, "nT", "Time = ", rel_time)
+        measure_out.write(str(rel_time) + " " + str(cur_field) + "\n")
+
+    offset = (np.mean(field) + np.mean(field_flip)) * 0.5
+    print("Offset:", offset, "nT")
+    offset_out.write(str(offset) + "\n")
     power.power_state(1)
     time.sleep(6)
     motor.rotate(-10000)
     time.sleep(4)
+    print("Doing random rotation")
+    motor.rotate(np.random.randint(10000)-5000)
+    time.sleep(4)
+    power.power_state(0)
 
 offset_out.close()
+measure_out.close()

@@ -1,13 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+t = [x for x in range(0, 20400, 400)]
+x = np.loadtxt("ang_vs_field2.txt")[:,1]
 
-theta = np.linspace(0,2*np.pi,41)
-x = np.loadtxt("angular_1.txt")[:,0]
 ax = plt.subplot(111)
-ax.plot(theta, x)
-
+ax.plot(t, x, '.')
 ax.grid(True)
+plt.xlabel('time (s)')
+plt.ylabel('field (nT)')
 
-ax.set_title("A line plot on a polar axis", va='bottom')
 plt.show()
