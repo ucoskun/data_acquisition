@@ -67,7 +67,7 @@ for i in angle_list:
     
     power.power_state(1)
     time.sleep(10)
-    motor.rotate(400)
+    motor.rotate(-400)
     time.sleep(2)
 
 measure_out.close()
