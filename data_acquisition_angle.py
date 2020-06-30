@@ -44,7 +44,7 @@ def measure():
     return nT
 
 # Make sure power is of in the beginning and wait for 8 seconds
-measure_out = open("ang_vs_field2.txt", "w+")
+measure_out = open("ang_vs_field3.txt", "w+")
 
 init_time = time.time()
 
