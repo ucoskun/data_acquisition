@@ -5,7 +5,7 @@ import time
 import serial
 
 class RelayControl:
-    def __init__(self, port_path, baud = 9600, timeout = 3):
+    def __init__(self, port_path, baud = 9600, write_timeout = 1, timeout = 3):
 
         self.port_path = port_path
         self.ser = serial.Serial('COM3', 9600, timeout = 3)
