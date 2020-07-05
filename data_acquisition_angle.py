@@ -44,7 +44,7 @@ def measure():
     return nT
 
 # Make sure power is of in the beginning and wait for 8 seconds
-measure_out = open("ang_vs_field_7_2_2020_probe18_run2.txt", "w+")
+measure_out = open("ang_vs_field_7_5_2020_probe19_run1.txt", "w+")
 
 init_time = time.time()
 
@@ -56,7 +56,7 @@ for i in angle_list:
     power.power_state(0)
     time.sleep(10)
 
-    for i in range(10):
+    for i in range(2):
         cur_field = measure()
         field.append(cur_field)
         time.sleep(0.3)
@@ -67,7 +67,7 @@ for i in angle_list:
     
     power.power_state(1)
     time.sleep(10)
-    motor.rotate(-400)
+    motor.rotate(400)
     time.sleep(2)
 
 measure_out.close()
