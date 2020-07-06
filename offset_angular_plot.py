@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 data_path = "data_out"
 t = [x * 360 / 20000 for x in range(0, 10400, 400)]
-x = np.loadtxt(data_path + "/ang_vs_field_7_5_2020_probe19_run1.txt")[:,1]
+x = np.loadtxt(data_path + "/ang_vs_field_7_6_2020_probe12_run1.txt")[:,1]
 
 off = [(x[i]+x[25+i])/2 for i in range(26)]
 
