@@ -12,7 +12,7 @@ volt_nT = 10000
 uT_mG = 10
 
 # Initialize serial communication with Step Motor Driver
-motor = serial4850.Serial4850('COM1')
+motor = serial4850.Serial4850('COM4')
 
 # Initialize serial communication with Arduino
 power = relaycontrol.RelayControl('COM3')
@@ -44,7 +44,7 @@ def measure():
     return nT
 
 # Make sure power is of in the beginning and wait for 8 seconds
-measure_out = open("ang_vs_field_7_6_2020_probe12_run1.txt", "w+")
+measure_out = open("ang_vs_field_7_8_2020_probe23_run1.txt", "w+")
 
 init_time = time.time()
 
